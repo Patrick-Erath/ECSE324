@@ -7,7 +7,7 @@ int main(){
     int max_val=0;
     int i=0;
     for (i = 0; i < 5; i++) {
-      max_val = MAX_2(a[i],max_val);	
+      max_val = MAX_2(a[i],max_val);	// Return twice max val
  }
 	return max_val;
    
