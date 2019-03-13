@@ -15,6 +15,7 @@
 		int INT_en;
 		int enable;
 	}	HPS_TIM_config_t;
+
 	//Argument is a struct pointer
 	extern void HPS_TIM_config_ASM(HPS_TIM_config_t *param);
 

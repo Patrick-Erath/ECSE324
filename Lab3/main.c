@@ -9,16 +9,17 @@
 #include "./drivers/inc/address_map_arm.h"
 #include "./drivers/inc/int_setup.h"
 
+#define TIMERINT
 int main(){
 	//  CODE FOR PART 1 !
-/*
+#ifdef PARTONE
 	while(1){
 		write_LEDs_ASM(read_slider_switches_ASM());
 		}
-*/
+#endif
 
+#ifdef PARTTWO
 	// CODE FOR PART 2 !
-/*
 	while(1){
 		write_LEDs_ASM(read_slider_switches_ASM());
 		if(read_slider_switches_ASM() & 0x200){
@@ -38,9 +39,9 @@ int main(){
 			HEX_write_ASM(pushbutton, hex_val);//write the value on display
 		}
 	}
-*/
+#endif
 	// SAMPLE CODE FOR TIMER !
-/*
+#ifdef SAMPLE
 	int count0 = 0, count1 = 0, count2 = 0, count3 = 0;
 	HPS_TIM_config_t hps_tim;
 	hps_tim.tim = TIM0|TIM1|TIM2|TIM3;
@@ -76,9 +77,10 @@ int main(){
 			HEX_write_ASM(HEX3, (count3+48));
 		}
 	}
-*/
+#endif
 	// CODE FOR QUESTION 3 (MINUTE, SECOND, MILISECOND TIMER)
-/*
+#ifdef TIMERPOLL
+	//This timer is for the watch
 	HPS_TIM_config_t hps_tim;
 	hps_tim.tim = TIM0;
 	hps_tim.timeout = 10000;
@@ -86,6 +88,7 @@ int main(){
 	hps_tim.INT_en = 1;
 	hps_tim.enable = 1;
 	HPS_TIM_config_ASM(&hps_tim); //Config timer 1
+
 	//This timer is for the pushbutton polling
 	HPS_TIM_config_t hps_tim_pb;
 	hps_tim_pb.tim = TIM1;
@@ -94,7 +97,8 @@ int main(){
 	hps_tim_pb.INT_en = 1;
 	hps_tim_pb.enable = 1;
 	HPS_TIM_config_ASM(&hps_tim_pb); //config timer 2
-	//declare our init
+
+	//Declare our init
 	int micros = 0;
 	int seconds = 0;
 	int minutes = 0;
@@ -128,8 +132,8 @@ int main(){
 		}
 		//for the pushbuttons polling
 		if (HPS_TIM_read_INT_ASM(TIM1)) {
-			HPS_TIM_clear_INT_ASM(TIM1);
-			int pushbutton = 0xF & read_PB_data_ASM();
+			HPS_TIM_clear_INT_ASM(TIM1); //reset
+			int pushbutton = 0xF & read_PB_data_ASM(); // read_PB_edgecap_ASM()
 			//Start timer
 			if ((pushbutton & 1) && (!timerstart)) {
 				timerstart = 1;
@@ -154,10 +158,10 @@ int main(){
 			}
 		}
 	}
-*/
-
-// SAMPLE CODE FOR INTERUPT BASED STOPWATCH
-	//enable the pb interrupts
+#endif
+// Part 4: SAMPLE CODE FOR INTERUPT BASED STOPWATCH
+#ifdef TIMERINT
+	//enable the pb interrupts 
 	int_setup(2, (int[]) {73, 199 });
 	enable_PB_INT_ASM(PB0 | PB1 | PB2);
 	
@@ -207,11 +211,11 @@ int main(){
 		}
 		//if pushbutton flag active, the ISR is active, we do something according to which button pressed
 		if (pb_int_flag != 0){
-			if(pb_int_flag == 1)
+			if(pb_int_flag == 1) //start
 				timerstart=1;
-			else if(pb_int_flag == 2)
+			else if(pb_int_flag == 2) //pause
 				timerstart = 0;
-			else if(pb_int_flag == 4 & timerstart==0){
+			else if(pb_int_flag == 4 & timerstart==0){ // reset timer
 				micros = 0;
 				seconds = 0;
 				minutes = 0;
@@ -225,6 +229,7 @@ int main(){
 			pb_int_flag = 0;
 		}
 	}
+#endif
 return 0;
 
 }
