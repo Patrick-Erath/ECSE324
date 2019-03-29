@@ -1,0 +1,32 @@
+.text
+
+	.equ AUDIO_PORT_FIFOSPACE, 0xFF203044
+	.equ LEFTDATA, 0xFF203048
+	.equ RIGHTDATA, 0xFF20304C
+	
+	.global write_audio_data
+	
+write_audio_data:
+	PUSH {R1-R3}
+	LDR R1, =AUDIO_PORT_FIFOSPACE 
+	LDR R2, [R1] 
+	AND R3, R2, #0x00FF0000 //Right space
+	CMP R3, #0
+	BEQ NOSPACE 
+	AND R3, R2, #0xFF000000 //Left space
+	CMP R3, #0
+	BEQ NOSPACE 
+	LDR R1, =LEFTDATA
+	STR R0, [R1] 
+	LDR R1, =RIGHTDATA
+	STR R0, [R1] 
+	MOV R0, #1 
+	POP {R1-R3}
+	BX LR
+
+NOSPACE:
+	MOV R0, #0 
+	POP {R1-R3}
+	BX LR
+
+.end
